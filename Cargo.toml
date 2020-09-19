@@ -3,6 +3,15 @@ name = "r-cache"
 version = "0.1.0"
 authors = ["cobbinma <cobbinma@gmail.com>"]
 edition = "2018"
+description = "r-cache is an in memory key value store. It is thread safe and values have expiry times"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/cobbinma/r-cache"
+categories = [
+    "caching",
+    "asynchronous"
+]
+keywords = ["cache", "async"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
