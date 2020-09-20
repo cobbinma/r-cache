@@ -5,7 +5,7 @@ use crate::item::Item;
 use chrono::Duration;
 use std::hash::Hash;
 
-struct Cache<T, V> {
+pub struct Cache<T, V> {
     items: RwLock<HashMap<T, Item<V>>>,
     item_duration: Option<Duration>,
 }
