@@ -7,11 +7,11 @@ use std::hash::Hash;
 
 struct Cache<T, V> {
     items: RwLock<HashMap<T, Item<V>>>,
-    item_duration: Duration,
+    item_duration: Option<Duration>,
 }
 
 impl<T, V> Cache<T, V> {
-    pub fn new(item_duration: Duration) -> Self {
+    pub fn new(item_duration: Option<Duration>) -> Self {
         Cache {
             items: RwLock::new(HashMap::new()),
             item_duration,
@@ -54,9 +54,22 @@ mod tests {
     const VALUE: &str = "VALUE";
 
     #[test]
-    fn set_and_get_value() {
+    fn set_and_get_value_with_duration() {
         task::block_on(async {
-            let cache = Cache::new(chrono::Duration::minutes(1));
+            let cache = Cache::new(Some(chrono::Duration::minutes(1)));
+            cache.set(KEY, VALUE).await;
+            let value = cache.get(KEY).await;
+            match value {
+                Some(value) => assert_eq!(value, VALUE),
+                None => panic!("value was not found in cache")
+            };
+        })
+    }
+
+    #[test]
+    fn set_and_get_value_without_duration() {
+        task::block_on(async {
+            let cache = Cache::new(None);
             cache.set(KEY, VALUE).await;
             let value = cache.get(KEY).await;
             match value {
