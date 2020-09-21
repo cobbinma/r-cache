@@ -78,4 +78,19 @@ mod tests {
             };
         })
     }
+
+    #[test]
+    fn replace_existing_value() {
+        const NEW_VALUE: &str = "NEW_VALUE";
+        task::block_on(async {
+            let cache = Cache::new(Some(chrono::Duration::minutes(1)));
+            cache.set(KEY, VALUE).await;
+            cache.set(KEY, NEW_VALUE).await;
+            let value = cache.get(KEY).await;
+            match value {
+                Some(value) => assert_eq!(value, NEW_VALUE),
+                None => panic!("value was not found in cache"),
+            };
+        })
+    }
 }
