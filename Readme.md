@@ -37,6 +37,9 @@ async fn main() -> Result<(), std::io::Error> {
     let cache = Cache::new(Some(chrono::Duration::hours(2)));
     cache.set(KEY, VALUE).await;
     let value = cache.get(KEY).await;
+    if let Some(value) = value {
+        println!("{}", value)
+    }
     Ok(())
 }
 ```
