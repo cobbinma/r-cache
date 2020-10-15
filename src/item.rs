@@ -30,6 +30,7 @@ impl<T> Item<T> {
 mod tests {
     use crate::item::Item;
     use async_std::task;
+    use std::time::Duration;
 
     const OBJECT: &str = "OBJECT";
 
@@ -38,6 +39,14 @@ mod tests {
         task::block_on(async {
             let item = Item::new(OBJECT, None);
             assert_eq!(item.expired(), false);
+        })
+    }
+
+    #[test]
+    fn expired_when_duration_is_zero() {
+        task::block_on(async {
+            let item = Item::new(OBJECT, Some(Duration::new(0, 0)));
+            assert_eq!(item.expired(), true);
         })
     }
 }
