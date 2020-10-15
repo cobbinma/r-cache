@@ -1,15 +1,15 @@
-use chrono::{DateTime, Utc, Duration};
+use std::time::{Instant, Duration};
 
 #[derive(Clone)]
 pub struct Item<T> {
     pub object: T,
-    expiry: Option<DateTime<Utc>>,
+    expiry: Option<Instant>,
 }
 
 impl<T> Item<T> {
     pub fn new(object: T, item_duration: Option<Duration>) -> Self {
         let expiry = match item_duration {
-            Some(duration) => Some(Utc::now() + duration),
+            Some(duration) => Some(Instant::now() + duration),
             None => None,
         };
         Item {
@@ -20,7 +20,7 @@ impl<T> Item<T> {
 
     pub fn expired(&self) -> bool {
         if let Some(expiry) = self.expiry {
-            return expiry < Utc::now()
+            return expiry < Instant::now()
         }
         false
     }

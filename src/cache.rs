@@ -2,7 +2,7 @@ use async_std::sync::RwLock;
 use std::collections::HashMap;
 
 use crate::item::Item;
-use chrono::Duration;
+use std::time::Duration;
 use std::hash::Hash;
 
 pub struct Cache<T, V> {
@@ -49,6 +49,7 @@ impl<T, V> Cache<T, V> {
 mod tests {
     use crate::cache::Cache;
     use async_std::task;
+    use std::time::Duration;
 
     const KEY: i8 = 0;
     const VALUE: &str = "VALUE";
@@ -56,7 +57,7 @@ mod tests {
     #[test]
     fn set_and_get_value_with_duration() {
         task::block_on(async {
-            let cache = Cache::new(Some(chrono::Duration::minutes(1)));
+            let cache = Cache::new(Some(Duration::new(2, 0)));
             cache.set(KEY, VALUE).await;
             let value = cache.get(KEY).await;
             match value {
@@ -83,7 +84,7 @@ mod tests {
     fn replace_existing_value() {
         const NEW_VALUE: &str = "NEW_VALUE";
         task::block_on(async {
-            let cache = Cache::new(Some(chrono::Duration::minutes(1)));
+            let cache = Cache::new(Some(Duration::new(2, 0)));
             cache.set(KEY, VALUE).await;
             cache.set(KEY, NEW_VALUE).await;
             let value = cache.get(KEY).await;
