@@ -1,6 +1,6 @@
 [package]
 name = "r-cache"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["cobbinma <cobbinma@gmail.com>"]
 edition = "2018"
 description = "r-cache is an in memory key value store. It is thread safe and values have expiry times"

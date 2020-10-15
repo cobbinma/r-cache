@@ -57,7 +57,7 @@ mod tests {
     #[test]
     fn set_and_get_value_with_duration() {
         task::block_on(async {
-            let cache = Cache::new(Some(Duration::new(2, 0)));
+            let cache = Cache::new(Some(Duration::from_secs(2)));
             cache.set(KEY, VALUE).await;
             let value = cache.get(KEY).await;
             match value {
@@ -84,7 +84,7 @@ mod tests {
     fn replace_existing_value() {
         const NEW_VALUE: &str = "NEW_VALUE";
         task::block_on(async {
-            let cache = Cache::new(Some(Duration::new(2, 0)));
+            let cache = Cache::new(Some(Duration::from_secs(2)));
             cache.set(KEY, VALUE).await;
             cache.set(KEY, NEW_VALUE).await;
             let value = cache.get(KEY).await;
