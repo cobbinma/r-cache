@@ -48,50 +48,43 @@ impl<T, V> Cache<T, V> {
 #[cfg(test)]
 mod tests {
     use crate::cache::Cache;
-    use async_std::task;
     use std::time::Duration;
 
     const KEY: i8 = 0;
     const VALUE: &str = "VALUE";
 
-    #[test]
-    fn set_and_get_value_with_duration() {
-        task::block_on(async {
-            let cache = Cache::new(Some(Duration::from_secs(2)));
-            cache.set(KEY, VALUE).await;
-            let value = cache.get(KEY).await;
-            match value {
-                Some(value) => assert_eq!(value, VALUE),
-                None => panic!("value was not found in cache")
-            };
-        })
+    #[async_std::test]
+    async fn set_and_get_value_with_duration() {
+        let cache = Cache::new(Some(Duration::from_secs(2)));
+        cache.set(KEY, VALUE).await;
+        let value = cache.get(KEY).await;
+        match value {
+            Some(value) => assert_eq!(value, VALUE),
+            None => panic!("value was not found in cache")
+        };
     }
 
-    #[test]
-    fn set_and_get_value_without_duration() {
-        task::block_on(async {
-            let cache = Cache::new(None);
-            cache.set(KEY, VALUE).await;
-            let value = cache.get(KEY).await;
-            match value {
-                Some(value) => assert_eq!(value, VALUE),
-                None => panic!("value was not found in cache")
-            };
-        })
+    #[async_std::test]
+    async fn set_and_get_value_without_duration() {
+        let cache = Cache::new(None);
+        cache.set(KEY, VALUE).await;
+        let value = cache.get(KEY).await;
+        match value {
+            Some(value) => assert_eq!(value, VALUE),
+            None => panic!("value was not found in cache")
+        };
     }
 
-    #[test]
-    fn replace_existing_value() {
+    #[async_std::test]
+    async fn replace_existing_value() {
         const NEW_VALUE: &str = "NEW_VALUE";
-        task::block_on(async {
-            let cache = Cache::new(Some(Duration::from_secs(2)));
-            cache.set(KEY, VALUE).await;
-            cache.set(KEY, NEW_VALUE).await;
-            let value = cache.get(KEY).await;
-            match value {
-                Some(value) => assert_eq!(value, NEW_VALUE),
-                None => panic!("value was not found in cache"),
-            };
-        })
+        let cache = Cache::new(Some(Duration::from_secs(2)));
+        cache.set(KEY, VALUE).await;
+        cache.set(KEY, NEW_VALUE).await;
+        let value = cache.get(KEY).await;
+        match value {
+            Some(value) => assert_eq!(value, NEW_VALUE),
+            None => panic!("value was not found in cache"),
+        };
     }
 }

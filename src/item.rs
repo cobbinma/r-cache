@@ -29,24 +29,19 @@ impl<T> Item<T> {
 #[cfg(test)]
 mod tests {
     use crate::item::Item;
-    use async_std::task;
     use std::time::Duration;
 
     const OBJECT: &str = "OBJECT";
 
-    #[test]
-    fn not_expired_when_duration_is_none() {
-        task::block_on(async {
-            let item = Item::new(OBJECT, None);
-            assert_eq!(item.expired(), false);
-        })
+    #[async_std::test]
+    async fn not_expired_when_duration_is_none() {
+        let item = Item::new(OBJECT, None);
+        assert_eq!(item.expired(), false);
     }
 
-    #[test]
-    fn expired_when_duration_is_zero() {
-        task::block_on(async {
-            let item = Item::new(OBJECT, Some(Duration::new(0, 0)));
-            assert_eq!(item.expired(), true);
-        })
+    #[async_std::test]
+    async fn expired_when_duration_is_zero() {
+        let item = Item::new(OBJECT, Some(Duration::new(0, 0)));
+        assert_eq!(item.expired(), true);
     }
 }
