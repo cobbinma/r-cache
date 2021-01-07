@@ -2,9 +2,11 @@ use async_std::sync::RwLock;
 use std::collections::HashMap;
 
 use crate::item::Item;
-use std::time::Duration;
-use std::hash::Hash;
 use std::error::Error;
+use std::hash::Hash;
+use std::time::Duration;
+use std::iter::{Filter, Map};
+use std::collections::hash_map::Iter;
 
 pub struct Cache<T, V> {
     items: RwLock<HashMap<T, Item<V>>>,
@@ -22,7 +24,7 @@ impl<T, V> Cache<T, V> {
     pub async fn get(&self, key: T) -> Option<V>
     where
         T: Eq + Hash,
-        V: Clone
+        V: Clone,
     {
         if let Some(item) = self.items.read().await.get(&key).cloned() {
             return if item.expired() {
@@ -36,7 +38,7 @@ impl<T, V> Cache<T, V> {
 
     pub async fn set(&self, key: T, value: V) -> Option<V>
     where
-        T: Eq + Hash
+        T: Eq + Hash,
     {
         self.items
             .write()
@@ -45,9 +47,22 @@ impl<T, V> Cache<T, V> {
             .map(|item| item.object)
     }
 
-    pub async fn remove_expired_items(&self) -> Result<(), Box<dyn Error>>
+    pub async fn remove_expired_items(&self)
+    where
+        T: Eq + Hash + Clone,
     {
-        unimplemented!()
+        let expired: Vec<T> = self
+            .items
+            .read()
+            .await
+            .iter()
+            .filter(|(_, item)| item.expired())
+            .map(|(k, _)| k.clone())
+            .collect();
+
+        for key in expired {
+            &self.items.write().await.remove(&key);
+        };
     }
 }
 
@@ -66,7 +81,7 @@ mod tests {
         let value = cache.get(KEY).await;
         match value {
             Some(value) => assert_eq!(value, VALUE),
-            None => panic!("value was not found in cache")
+            None => panic!("value was not found in cache"),
         };
     }
 
@@ -77,7 +92,7 @@ mod tests {
         let value = cache.get(KEY).await;
         match value {
             Some(value) => assert_eq!(value, VALUE),
-            None => panic!("value was not found in cache")
+            None => panic!("value was not found in cache"),
         };
     }
 
@@ -98,7 +113,9 @@ mod tests {
     async fn remove_expired_item() {
         let cache = Cache::new(Some(Duration::from_secs(0)));
         cache.set(KEY, VALUE).await;
-        cache.remove_expired_items().await.expect("could not remove expired items");
+        cache
+            .remove_expired_items()
+            .await;
         if cache.items.read().await.get(&KEY).is_some() {
             panic!("found expired item in cache")
         };

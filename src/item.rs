@@ -1,4 +1,4 @@
-use std::time::{Instant, Duration};
+use std::time::{Duration, Instant};
 
 #[derive(Clone)]
 pub struct Item<T> {
@@ -12,15 +12,12 @@ impl<T> Item<T> {
             Some(duration) => Some(Instant::now() + duration),
             None => None,
         };
-        Item {
-            object,
-            expiry,
-        }
+        Item { object, expiry }
     }
 
     pub fn expired(&self) -> bool {
         if let Some(expiry) = self.expiry {
-            return expiry < Instant::now()
+            return expiry < Instant::now();
         }
         false
     }
