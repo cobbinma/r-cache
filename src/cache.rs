@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use crate::item::Item;
 use std::time::Duration;
 use std::hash::Hash;
+use std::error::Error;
 
 pub struct Cache<T, V> {
     items: RwLock<HashMap<T, Item<V>>>,
@@ -42,6 +43,11 @@ impl<T, V> Cache<T, V> {
             .await
             .insert(key, Item::new(value, self.item_duration))
             .map(|item| item.object)
+    }
+
+    pub async fn remove_expired_items(&self) -> Result<(), Box<dyn Error>>
+    {
+        unimplemented!()
     }
 }
 
@@ -92,7 +98,7 @@ mod tests {
     async fn remove_expired_item() {
         let cache = Cache::new(Some(Duration::from_secs(0)));
         cache.set(KEY, VALUE).await;
-        cache.remove_expired_items().await.expect("should not error here");
+        cache.remove_expired_items().await.expect("could not remove expired items");
         if cache.items.read().await.get(&KEY).is_some() {
             panic!("found expired item in cache")
         };
