@@ -87,4 +87,14 @@ mod tests {
             None => panic!("value was not found in cache"),
         };
     }
+
+    #[async_std::test]
+    async fn remove_expired_item() {
+        let cache = Cache::new(Some(Duration::from_secs(0)));
+        cache.set(KEY, VALUE).await;
+        cache.remove_expired_items().await.expect("should not error here");
+        if cache.items.read().await.get(&KEY).is_some() {
+            panic!("found expired item in cache")
+        };
+    }
 }
