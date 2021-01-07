@@ -2,11 +2,8 @@ use async_std::sync::RwLock;
 use std::collections::HashMap;
 
 use crate::item::Item;
-use std::error::Error;
 use std::hash::Hash;
 use std::time::Duration;
-use std::iter::{Filter, Map};
-use std::collections::hash_map::Iter;
 
 pub struct Cache<T, V> {
     items: RwLock<HashMap<T, Item<V>>>,
@@ -61,7 +58,7 @@ impl<T, V> Cache<T, V> {
             .collect();
 
         for key in expired {
-            &self.items.write().await.remove(&key);
+            self.items.write().await.remove(&key);
         };
     }
 }
