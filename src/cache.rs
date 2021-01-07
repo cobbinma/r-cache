@@ -59,7 +59,7 @@ impl<T, V> Cache<T, V> {
 
         for key in expired {
             self.items.write().await.remove(&key);
-        };
+        }
     }
 }
 
@@ -110,9 +110,7 @@ mod tests {
     async fn remove_expired_item() {
         let cache = Cache::new(Some(Duration::from_secs(0)));
         cache.set(KEY, VALUE).await;
-        cache
-            .remove_expired_items()
-            .await;
+        cache.remove_expired_items().await;
         if cache.items.read().await.get(&KEY).is_some() {
             panic!("found expired item in cache")
         };
@@ -122,9 +120,7 @@ mod tests {
     async fn do_not_remove_not_expired_item() {
         let cache = Cache::new(Some(Duration::from_secs(2)));
         cache.set(KEY, VALUE).await;
-        cache
-            .remove_expired_items()
-            .await;
+        cache.remove_expired_items().await;
         if cache.items.read().await.get(&KEY).is_none() {
             panic!("could not find not expired item in cache")
         };
