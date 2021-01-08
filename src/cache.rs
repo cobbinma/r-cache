@@ -23,14 +23,12 @@ impl<T, V> Cache<T, V> {
         T: Eq + Hash,
         V: Clone,
     {
-        if let Some(item) = self.items.read().await.get(&key).cloned() {
-            return if item.expired() {
-                None
-            } else {
-                Some(item.object)
-            };
-        };
-        None
+        self.items
+            .read()
+            .await
+            .get(&key)
+            .filter(|&item| !item.expired())
+            .map(|item| item.object.clone())
     }
 
     pub async fn set(&self, key: T, value: V) -> Option<V>
@@ -90,6 +88,16 @@ mod tests {
         match value {
             Some(value) => assert_eq!(value, VALUE),
             None => panic!("value was not found in cache"),
+        };
+    }
+
+    #[async_std::test]
+    async fn do_not_get_expired_value() {
+        let cache = Cache::new(Some(Duration::from_secs(0)));
+        cache.set(KEY, VALUE).await;
+        let value = cache.get(KEY).await;
+        if let Some(_) = value {
+            panic!("found expired value in cache")
         };
     }
 
