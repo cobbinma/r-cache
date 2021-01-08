@@ -46,7 +46,7 @@ impl<T, V> Cache<T, V> {
     where
         T: Eq + Hash + Clone,
     {
-        let expired: Vec<T> = self
+        let expired_keys: Vec<T> = self
             .items
             .read()
             .await
@@ -55,7 +55,7 @@ impl<T, V> Cache<T, V> {
             .map(|(k, _)| k.clone())
             .collect();
 
-        for key in expired {
+        for key in expired_keys {
             self.items.write().await.remove(&key);
         }
     }
