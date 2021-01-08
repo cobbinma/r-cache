@@ -8,18 +8,14 @@ pub struct Item<T> {
 
 impl<T> Item<T> {
     pub fn new(object: T, item_duration: Option<Duration>) -> Self {
-        let expiry = match item_duration {
-            Some(duration) => Some(Instant::now() + duration),
-            None => None,
-        };
+        let expiry = item_duration.map(|duration| Instant::now() + duration);
         Item { object, expiry }
     }
 
     pub fn expired(&self) -> bool {
-        if let Some(expiry) = self.expiry {
-            return expiry < Instant::now();
-        }
-        false
+        self.expiry
+            .map(|expiry| expiry < Instant::now())
+            .unwrap_or(false)
     }
 }
 
