@@ -96,7 +96,7 @@ mod tests {
         let cache = Cache::new(Some(Duration::from_secs(0)));
         cache.set(KEY, VALUE).await;
         let value = cache.get(KEY).await;
-        if let Some(_) = value {
+        if value.is_some() {
             panic!("found expired value in cache")
         };
     }
