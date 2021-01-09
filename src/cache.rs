@@ -60,8 +60,7 @@ impl<T, V> Cache<T, V> {
         }
     }
 
-    pub async fn clear(&self)
-    {
+    pub async fn clear(&self) {
         self.items.write().await.clear()
     }
 }
