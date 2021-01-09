@@ -42,7 +42,7 @@ impl<T, V> Cache<T, V> {
             .map(|item| item.object)
     }
 
-    pub async fn remove_expired_items(&self)
+    pub async fn remove_expired(&self)
     where
         T: Eq + Hash + Clone,
     {
@@ -58,6 +58,11 @@ impl<T, V> Cache<T, V> {
         for key in expired_keys {
             self.items.write().await.remove(&key);
         }
+    }
+
+    pub async fn clear(&self)
+    {
+        self.items.write().await.clear()
     }
 }
 
@@ -131,6 +136,16 @@ mod tests {
         cache.remove_expired_items().await;
         if cache.items.read().await.get(&KEY).is_none() {
             panic!("could not find not expired item in cache")
+        };
+    }
+
+    #[async_std::test]
+    async fn remove_not_expired_item() {
+        let cache = Cache::new(Some(Duration::from_secs(2)));
+        cache.set(KEY, VALUE).await;
+        cache.remove_all_items().await;
+        if cache.items.read().await.get(&KEY).is_some() {
+            panic!("found item in cache")
         };
     }
 }
