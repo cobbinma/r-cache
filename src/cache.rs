@@ -27,7 +27,7 @@ impl<T, V> Cache<T, V> {
             .read()
             .await
             .get(key)
-            .filter(|&item| !item.expired())
+            .filter(|item| !item.expired())
             .map(|item| item.object.clone())
     }
 
