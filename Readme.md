@@ -35,7 +35,7 @@ r-cache is an in memory key value store. It is thread safe and values can have e
 #[async_std::main]
 async fn main() -> Result<(), std::io::Error> {
     let cache = Cache::new(Some(Duration::from_secs(2 * 60 * 60)));
-    cache.set(KEY, VALUE).await;
+    cache.set(KEY, VALUE, None).await;
     let value = cache.get(KEY).await;
     if let Some(value) = value {
         println!("{}", value)
