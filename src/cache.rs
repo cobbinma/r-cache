@@ -18,7 +18,7 @@ impl<T, V> Cache<T, V> {
         }
     }
 
-    pub async fn get(&self, key: T) -> Option<V>
+    pub async fn get(&self, key: &T) -> Option<V>
     where
         T: Eq + Hash,
         V: Clone,
@@ -26,7 +26,7 @@ impl<T, V> Cache<T, V> {
         self.items
             .read()
             .await
-            .get(&key)
+            .get(key)
             .filter(|&item| !item.expired())
             .map(|item| item.object.clone())
     }
@@ -60,6 +60,13 @@ impl<T, V> Cache<T, V> {
         }
     }
 
+    pub async fn remove(&self, key: &T) -> Option<V>
+    where
+        T: Eq + Hash,
+    {
+        self.items.write().await.remove(key).map(|item| item.object)
+    }
+
     pub async fn clear(&self) {
         self.items.write().await.clear()
     }
@@ -77,7 +84,7 @@ mod tests {
     async fn set_and_get_value_with_duration() {
         let cache = Cache::new(Some(Duration::from_secs(2)));
         cache.set(KEY, VALUE).await;
-        let value = cache.get(KEY).await;
+        let value = cache.get(&KEY).await;
         match value {
             Some(value) => assert_eq!(value, VALUE),
             None => panic!("value was not found in cache"),
@@ -88,7 +95,7 @@ mod tests {
     async fn set_and_get_value_without_duration() {
         let cache = Cache::new(None);
         cache.set(KEY, VALUE).await;
-        let value = cache.get(KEY).await;
+        let value = cache.get(&KEY).await;
         match value {
             Some(value) => assert_eq!(value, VALUE),
             None => panic!("value was not found in cache"),
@@ -96,22 +103,22 @@ mod tests {
     }
 
     #[async_std::test]
-    async fn do_not_get_expired_value() {
+    async fn set_do_not_get_expired_value() {
         let cache = Cache::new(Some(Duration::from_secs(0)));
         cache.set(KEY, VALUE).await;
-        let value = cache.get(KEY).await;
+        let value = cache.get(&KEY).await;
         if value.is_some() {
             panic!("found expired value in cache")
         };
     }
 
     #[async_std::test]
-    async fn replace_existing_value() {
+    async fn set_replace_existing_value() {
         const NEW_VALUE: &str = "NEW_VALUE";
         let cache = Cache::new(Some(Duration::from_secs(2)));
         cache.set(KEY, VALUE).await;
         cache.set(KEY, NEW_VALUE).await;
-        let value = cache.get(KEY).await;
+        let value = cache.get(&KEY).await;
         match value {
             Some(value) => assert_eq!(value, NEW_VALUE),
             None => panic!("value was not found in cache"),
@@ -129,7 +136,7 @@ mod tests {
     }
 
     #[async_std::test]
-    async fn do_not_remove_not_expired_item() {
+    async fn remove_expired_do_not_remove_not_expired_item() {
         let cache = Cache::new(Some(Duration::from_secs(2)));
         cache.set(KEY, VALUE).await;
         cache.remove_expired().await;
@@ -139,12 +146,32 @@ mod tests {
     }
 
     #[async_std::test]
-    async fn remove_not_expired_item() {
+    async fn clear_not_expired_item() {
         let cache = Cache::new(Some(Duration::from_secs(2)));
         cache.set(KEY, VALUE).await;
         cache.clear().await;
         if cache.items.read().await.get(&KEY).is_some() {
             panic!("found item in cache")
+        };
+    }
+
+    #[async_std::test]
+    async fn remove_remove_expired_item() {
+        let cache = Cache::new(Some(Duration::from_secs(2)));
+        cache.set(KEY, VALUE).await;
+        if let None = cache.remove(&KEY).await {
+            panic!("none returned from removing existing value")
+        };
+        if cache.items.read().await.get(&KEY).is_some() {
+            panic!("found not expired item in cache")
+        };
+    }
+
+    #[async_std::test]
+    async fn remove_return_none_if_not_found() {
+        let cache: Cache<i8, &str> = Cache::new(Some(Duration::from_secs(2)));
+        if let Some(_) = cache.remove(&KEY).await {
+            panic!("some value was returned from remove")
         };
     }
 }
