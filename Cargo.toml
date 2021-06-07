@@ -1,6 +1,6 @@
 [package]
 name = "r-cache"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["cobbinma <cobbinma@gmail.com>"]
 edition = "2018"
 description = "r-cache is an in memory key value store. It is thread safe and values have expiry times"
@@ -16,4 +16,4 @@ keywords = ["cache", "async"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-std = { version = "1.8.0", features = ["attributes"] }
+async-std = { version = "1.9.0", features = ["attributes"] }
