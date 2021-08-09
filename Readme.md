@@ -32,7 +32,6 @@ r-cache is an in memory key value store. It is thread safe and values can have e
 ### Example
 
 ```rust
-#[async_std::main]
 async fn main() {
     let cache = Cache::new(Some(Duration::from_secs(2 * 60 * 60)));
     cache.set(KEY, VALUE, None).await;
