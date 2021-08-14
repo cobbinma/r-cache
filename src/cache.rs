@@ -11,6 +11,26 @@ pub struct Cache<T, V> {
 }
 
 impl<T, V> Cache<T, V> {
+    /// Construct a new `Cache` with a default item expiration time.
+    /// An item duration of `None` means items do not expire by default.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use r_cache::cache::Cache;
+    /// use std::time::Duration;
+    ///
+    /// const KEY: i8 = 0;
+    /// const VALUE: &str = "VALUE";
+    ///
+    /// #[async_std::main]
+    /// async fn main() {
+    ///    let cache = Cache::new(Some(Duration::from_secs(2 * 60 * 60)));
+    ///    cache.set(KEY, VALUE, None).await;
+    ///
+    ///    println!("{}", cache.get(&KEY).await.unwrap())
+    /// }
+    /// ```
     pub fn new(item_duration: Option<Duration>) -> Self {
         Cache {
             items: RwLock::new(HashMap::new()),
@@ -18,6 +38,7 @@ impl<T, V> Cache<T, V> {
         }
     }
 
+    /// Get a cache item associated with a given key.
     pub async fn get(&self, key: &T) -> Option<V>
     where
         T: Eq + Hash,
@@ -31,6 +52,8 @@ impl<T, V> Cache<T, V> {
             .map(|item| item.object.clone())
     }
 
+    /// Set an item in the cache with an associated key.
+    /// The item will have the default cache expiration time if custom duration of `None` is given.
     pub async fn set(&self, key: T, value: V, custom_duration: Option<Duration>) -> Option<V>
     where
         T: Eq + Hash,
@@ -45,6 +68,7 @@ impl<T, V> Cache<T, V> {
             .map(|item| item.object)
     }
 
+    /// Remove all expired items from the cache.
     pub async fn remove_expired(&self)
     where
         T: Eq + Hash + Clone,
@@ -63,6 +87,7 @@ impl<T, V> Cache<T, V> {
         }
     }
 
+    /// Remove an item from the cache associated with a given key.
     pub async fn remove(&self, key: &T) -> Option<V>
     where
         T: Eq + Hash,
@@ -70,6 +95,7 @@ impl<T, V> Cache<T, V> {
         self.items.write().await.remove(key).map(|item| item.object)
     }
 
+    /// Clear the entire cache of all items regardless of expiry times.
     pub async fn clear(&self) {
         self.items.write().await.clear()
     }
