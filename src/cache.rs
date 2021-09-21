@@ -17,6 +17,8 @@ impl<T, V> Cache<T, V> {
     /// # Example
     ///
     /// ```rust
+    /// use async_std::sync::Arc;
+    /// use async_std::task;
     /// use r_cache::cache::Cache;
     /// use std::time::Duration;
     ///
@@ -25,10 +27,20 @@ impl<T, V> Cache<T, V> {
     ///
     /// #[async_std::main]
     /// async fn main() {
-    ///    let cache = Cache::new(Some(Duration::from_secs(2 * 60 * 60)));
-    ///    cache.set(KEY, VALUE, None).await;
+    ///     let cache = Arc::new(Cache::new(Some(Duration::from_secs(5 * 60))));
+    ///     task::spawn({
+    ///         let cache = Arc::clone(&cache);
+    ///         async move {
+    ///             loop {
+    ///                 task::sleep(Duration::from_secs(10 * 60)).await;
+    ///                 cache.remove_expired().await;
+    ///             }
+    ///         }
+    ///     });
     ///
-    ///    println!("{}", cache.get(&KEY).await.unwrap())
+    ///     cache.set(KEY, VALUE, None).await;
+    ///
+    ///     assert_eq!(VALUE, cache.get(&KEY).await.unwrap())
     /// }
     /// ```
     pub fn new(item_duration: Option<Duration>) -> Self {
