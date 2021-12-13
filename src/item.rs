@@ -23,6 +23,8 @@ impl<T> Item<T> {
 
 #[cfg(test)]
 mod tests {
+    use async_std::task;
+
     use crate::item::Item;
     use std::time::Duration;
 
@@ -37,6 +39,7 @@ mod tests {
     #[async_std::test]
     async fn expired_when_duration_is_zero() {
         let item = Item::new(OBJECT, Some(Duration::new(0, 0)));
+        task::sleep(Duration::from_millis(1)).await;
         assert_eq!(item.expired(), true);
     }
 }
