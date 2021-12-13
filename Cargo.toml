@@ -1,6 +1,6 @@
 [package]
 name = "r-cache"
-version = "0.4.3"
+version = "0.4.4"
 authors = ["cobbinma <cobbinma@gmail.com>"]
 edition = "2018"
 description = "r-cache is an in memory key value store. It is thread safe and values have expiry times"
@@ -19,4 +19,4 @@ keywords = ["cache", "async"]
 async-lock = "2.4.0"
 
 [dev-dependencies]
-async-std = { version = "1.9.0", features = ["attributes"] }
+async-std = { version = "1.10.0", features = ["attributes"] }
