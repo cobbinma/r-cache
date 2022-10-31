@@ -111,6 +111,14 @@ impl<T, V> Cache<T, V> {
     pub async fn clear(&self) {
         self.items.write().await.clear()
     }
+
+    /// Reclaim memory from removed / cleared items
+    pub async fn shrink(&self)
+    where
+        T: Eq + Hash,
+    {
+        self.items.write().await.shrink_to_fit()
+    }
 }
 
 #[cfg(test)]
