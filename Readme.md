@@ -48,13 +48,13 @@ async fn main() {
         async move {
             loop {
                 task::sleep(Duration::from_secs(10 * 60)).await;
-                cache.remove_expired().await;
+                cache.remove_expired();
             }
         }
     });
 
-    cache.set(KEY, VALUE, None).await;
+    cache.set(KEY, VALUE, None);
 
-    assert_eq!(VALUE, cache.get(&KEY).await.unwrap())
+    assert_eq!(VALUE, cache.get(&KEY).unwrap())
 }
 ```
