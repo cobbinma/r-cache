@@ -13,9 +13,9 @@
 //! # #[async_std::main]
 //! # async fn main() {
 //!    let cache = Cache::new(Some(Duration::from_secs(2 * 60 * 60)));
-//!    cache.set(KEY, VALUE, None).await;
+//!    cache.set(KEY, VALUE, None);
 //!
-//!    println!("{}", cache.get(&KEY).await.unwrap())
+//!    println!("{}", cache.get(&KEY).unwrap())
 //! }
 //! ```
 
