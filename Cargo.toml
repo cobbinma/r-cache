@@ -18,4 +18,4 @@ keywords = ["cache"]
 dashmap = "5.4"
 
 [dev-dependencies]
-async-std = { version = "1.10.0", features = ["attributes"] }
+async-std = { version = "1.12", features = ["attributes"] }
